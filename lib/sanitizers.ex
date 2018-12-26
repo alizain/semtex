@@ -29,15 +29,19 @@ defmodule Semtex.Sanitizers do
             curr_attrs
 
           attr_value ->
-            [scheme | _] =
-              attr_value
-              |> String.trim()
-              |> String.split(":", parts: :infinity, trim: true)
+            attr_value
+            |> String.trim()
+            |> String.split(":", parts: :infinity, trim: true)
+            |> case do
+              [scheme | _] ->
+                if scheme in allowed_url_schemes do
+                  curr_attrs
+                else
+                  Map.delete(curr_attrs, attr_to_check)
+                end
 
-            if scheme in allowed_url_schemes do
-              curr_attrs
-            else
-              Map.delete(curr_attrs, attr_to_check)
+              [] ->
+                curr_attrs
             end
         end
       end)
