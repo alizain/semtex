@@ -1,4 +1,4 @@
-defmodule Semtex.Sanitizers do
+defmodule Semtex.SanitizerPasses do
   def keep_allowed_tags({tag, _attrs, _children}, %{"allowed_tags" => allowed_tags}) do
     if tag in allowed_tags do
       {:pass}
@@ -53,7 +53,7 @@ defmodule Semtex.Sanitizers do
     {:pass}
   end
 
-  def replace_link_rel_values({"a", attrs, children} = node, %{"link_rel_values" => link_rel_values}) do
+  def replace_link_rel_values({"a", attrs, children}, %{"link_rel_values" => link_rel_values}) do
     {:replace, {"a", Map.put(attrs, "rel", Enum.join(link_rel_values, " ")), children}}
   end
 
