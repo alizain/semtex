@@ -17,11 +17,13 @@ defmodule Semtex do
   end
 
   def parse_raw_html(raw_html) do
-    with {:ok, parsed_html} <- Html5ever.parse(raw_html),
-         {:ok, body_nodes} <- unwrap_nodes(parsed_html, ["html", "body"])
-    do
-      {:ok, body_nodes}
+    with {:ok, parsed_html} <- Html5ever.parse(raw_html) do
+      unwrap_nodes(parsed_html, ["html", "body"])
     end
+  end
+
+  def unwrap_nodes([], [_tag_to_find | _remaining_tags]) do
+    {:error, "not found"}
   end
 
   def unwrap_nodes([{_tag, _attrs, _children} | _] = nodes, [last_tag_to_find]) do

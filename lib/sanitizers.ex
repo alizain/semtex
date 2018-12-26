@@ -21,17 +21,28 @@ defmodule Semtex.Sanitizers do
     {:replace, {tag, filtered_attrs, children}}
   end
 
-  def keep_allowed_url_schemes({tag, %{"href" => href} = attrs, children}, %{"allowed_url_schemes" => allowed_url_schemes}) do
-    [scheme | _] =
-      href
-      |> String.trim()
-      |> String.split(":", parts: :infinity, trim: true)
-      
-    if scheme in allowed_url_schemes do
-      {:pass}
-    else
-      {:replace, {tag, Map.delete(attrs, "href"), children}}
-    end
+  def keep_allowed_url_schemes({tag, attrs, children}, %{"allowed_url_scheme_on_attributes" => allowed_url_scheme_on_attributes, "allowed_url_schemes" => allowed_url_schemes}) do
+    new_attrs =
+      Enum.reduce(allowed_url_scheme_on_attributes, attrs, fn attr_to_check, curr_attrs ->
+        case Map.get(curr_attrs, attr_to_check, nil) do
+          nil ->
+            curr_attrs
+
+          attr_value ->
+            [scheme | _] =
+              attr_value
+              |> String.trim()
+              |> String.split(":", parts: :infinity, trim: true)
+
+            if scheme in allowed_url_schemes do
+              curr_attrs
+            else
+              Map.delete(curr_attrs, attr_to_check)
+            end
+        end
+      end)
+
+    {:replace, {tag, new_attrs, children}}
   end
 
   def keep_allowed_url_schemes(_node, _config) do

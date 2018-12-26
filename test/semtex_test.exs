@@ -23,6 +23,22 @@ defmodule SemtexTest do
             """
 
   test "greets the world" do
-    assert Semtex.sanitize(@html_str, @config) == :world
+    result =
+      """
+      <a href="\xE2\x80\x85javascript:javascript:alert(1)" id="fuzzelement1">test</a>
+      """
+      |> String.trim()
+      |> IO.inspect
+      |> Semtex.sanitize(@config)
+      |> IO.inspect
+      |> Semtex.Serializer.ast_to_json!()
+
+    IO.puts(result)
+
+    result
+    |> Semtex.Serializer.json_to_html!()
+    |> IO.puts
+
+    assert true
   end
 end

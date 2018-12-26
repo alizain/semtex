@@ -104,6 +104,10 @@
     "wtai",
     "xmpp"
   ],
+  "allowed_url_scheme_on_attributes": [
+    "href",
+    "src"
+  ],
   "link_rel_values": [
     "noopener",
     "noreferrer",
