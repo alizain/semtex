@@ -1,4 +1,4 @@
-defmodule Semtex.SanitizerPasses do
+defmodule Semtex.Sanitizer.Passes do
   def keep_allowed_tags({tag, _attrs, _children}, %{"allowed_tags" => allowed_tags}) do
     if tag in allowed_tags do
       {:pass}
@@ -21,27 +21,21 @@ defmodule Semtex.SanitizerPasses do
     {:replace, {tag, filtered_attrs, children}}
   end
 
-  def keep_allowed_url_schemes({tag, attrs, children}, %{"allowed_url_scheme_on_attributes" => allowed_url_scheme_on_attributes, "allowed_url_schemes" => allowed_url_schemes}) do
+  def keep_allowed_url_schemes({tag, attrs, children}, %{"allowed_url_scheme_attributes" => allowed_url_scheme_attributes, "allowed_url_schemes" => allowed_url_schemes}) do
     new_attrs =
-      Enum.reduce(allowed_url_scheme_on_attributes, attrs, fn attr_to_check, curr_attrs ->
-        case Map.get(curr_attrs, attr_to_check, nil) do
+      Enum.reduce(allowed_url_scheme_attributes, attrs, fn attr_to_check, curr_attrs ->
+        curr_attrs
+        |> Map.get(attr_to_check, nil)
+        |> Semtex.Utils.scheme()
+        |> case do
           nil ->
             curr_attrs
 
-          attr_value ->
-            attr_value
-            |> String.trim()
-            |> String.split(":", parts: :infinity, trim: true)
-            |> case do
-              [scheme | _] ->
-                if scheme in allowed_url_schemes do
-                  curr_attrs
-                else
-                  Map.delete(curr_attrs, attr_to_check)
-                end
-
-              [] ->
-                curr_attrs
+          scheme ->
+            if not Enum.member?(allowed_url_schemes, scheme) do
+              curr_attrs |> Map.delete(attr_to_check)
+            else
+              curr_attrs
             end
         end
       end)

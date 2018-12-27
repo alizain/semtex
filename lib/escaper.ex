@@ -1,7 +1,7 @@
 defmodule Semtex.Escaper do
-  # From https://github.com/mathiasbynens/he
-  @escape_regex ~r/["&'<>`]/
+  @escape_regex ~r/["&'<>`\ \!@$%()=+{}\[\]\/*\,\-;^|]/
   @escape_replacements %{
+    # From https://github.com/mathiasbynens/he
     "\"" => "&quot;",
     "&" => "&amp;",
     "'" => "&#x27;",
@@ -16,6 +16,27 @@ defmodule Semtex.Escaper do
     # See http://html5sec.org/#102, http://html5sec.org/#108, and
     # http://html5sec.org/#133.
     "`" => "&#x60;",
+    # More characters to escape from https://wonko.com/post/html-escaping
+    " " => "&#x20;",
+    "!" => "&#x21;",
+    "@" => "&#x40;",
+    "$" => "&#x24;",
+    "%" => "&#x25;",
+    "(" => "&#x28;",
+    ")" => "&#x29;",
+    "=" => "&#x3D;",
+    "+" => "&#x2B;",
+    "{" => "&#x7B;",
+    "}" => "&#x7D;",
+    "[" => "&#x5B;",
+    "]" => "&#x5D;",
+    "/" => "&#x2F;",
+    "*" => "&#x2A;",
+    "," => "&#x2C;",
+    "-" => "&#x2D;",
+    ";" => "&#x3B;",
+    "^" => "&#x5E;",
+    "|" => "&#x7C;",
   }
 
   def escape_str(raw_str) when is_binary(raw_str) do
