@@ -7,56 +7,14 @@ defmodule Semtex.Sanitizer do
   ]
 
   def sanitize!(raw_html, config, sanitizer_passes \\ @sanitizer_passes) do
-    {:ok, body_nodes} = parse_raw_html(raw_html)
+    {:ok, body_nodes} = parse_and_unwrap(raw_html)
     walk_nodes!(body_nodes, config, sanitizer_passes)
   end
 
-  defp parse_raw_html(raw_html) do
-    with {:ok, parsed_html} <- Html5ever.parse(raw_html) do
-      unwrap_nodes(parsed_html, ["html", "body"])
+  defp parse_and_unwrap(raw_html) do
+    with {:ok, parsed_html} <- Semtex.Parser.parse(raw_html) do
+      Semtex.Utils.unwrap_nodes(parsed_html, ["html", "body"])
     end
-  end
-
-  defp unwrap_nodes([], [_tag_to_find | _remaining_tags]) do
-    {:error, "not found"}
-  end
-
-  defp unwrap_nodes([{:doctype, "html", "", ""} | nodes], remaining_tags) do
-    unwrap_nodes(nodes, remaining_tags)
-  end
-
-  defp unwrap_nodes(nodes, [last_tag_to_find]) when is_list(nodes) do
-    case find_node(nodes, last_tag_to_find) do
-      nil ->
-        {:error, "not found"}
-
-      {_tag, _attrs, children} ->
-        {:ok, children}
-    end
-  end
-
-  defp unwrap_nodes(nodes, [tag_to_find | remaining_tags]) when is_list(nodes) do
-    next_nodes =
-      case find_node(nodes, tag_to_find) do
-        nil ->
-          nodes
-
-        {_tag, _attrs, children} ->
-          children
-      end
-
-    unwrap_nodes(next_nodes, remaining_tags)
-  end
-
-  defp find_node(nodes, tag_to_find) when is_list(nodes) do
-    nodes
-    |> Enum.find(nil, fn
-      {^tag_to_find, _attrs, _children} ->
-        true
-
-      _node ->
-        false
-    end)
   end
 
   defp walk_nodes!(nodes, config, sanitizer_passes) when is_list(nodes) do
