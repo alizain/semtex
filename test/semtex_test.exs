@@ -12,7 +12,7 @@ defmodule SemtexTest do
   def test_html_minification(html_str, config) do
     html_str
     |> Semtex.Parser.parse!()
-    |> Semtex.Minifier.minify!(config)
+    |> Semtex.minify!(config)
     |> Semtex.serialize!(config)
   end
 
