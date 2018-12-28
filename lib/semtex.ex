@@ -147,7 +147,7 @@ defmodule Semtex do
     Semtex.Serializer.serialize!(ast, config)
   end
 
-  def minify(ast, config \\ @config) do
+  def minify!(ast, config \\ @config) do
     Semtex.Minifier.minify!(ast, config)
   end
 end
