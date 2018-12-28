@@ -57,4 +57,18 @@ defmodule Semtex.Utils do
         false
     end)
   end
+
+  def apply_func_to_tags!(nodes, func) when is_list(nodes) do
+    nodes
+    |> Enum.map(&apply_func_to_tags!(&1, func))
+  end
+
+  def apply_func_to_tags!({_tag, _attrs, _children} = node, func) do
+    {applied_tag, applied_attrs, applied_children} = func.(node)
+    {applied_tag, applied_attrs, apply_func_to_tags!(applied_children, func)}
+  end
+
+  def apply_func_to_tags!(node, _func) do
+    node
+  end
 end

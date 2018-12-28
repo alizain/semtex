@@ -131,7 +131,8 @@ defmodule Semtex do
       "xmpp"
     ],
     "link_rel_values" => ["noopener", "noreferrer", "nofollow"],
-    "strip_comments" => true
+    "strip_comments" => true,
+    "escape_serialization" => true
   }
 
   def config() do
@@ -144,5 +145,9 @@ defmodule Semtex do
 
   def serialize!(ast, config \\ @config) do
     Semtex.Serializer.serialize!(ast, config)
+  end
+
+  def minify(ast, config \\ @config) do
+    Semtex.Minifier.minify!(ast, config)
   end
 end

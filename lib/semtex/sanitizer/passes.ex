@@ -1,10 +1,14 @@
 defmodule Semtex.Sanitizer.Passes do
-  def keep_allowed_tags({tag, _attrs, _children}, %{"allowed_tags" => allowed_tags}) do
+  def keep_allowed_tags({tag, _attrs, _children} = node, %{"allowed_tags" => allowed_tags}) do
     if tag in allowed_tags do
-      {:pass}
+      node
     else
-      {:remove}
+      nil
     end
+  end
+
+  def keep_allowed_tags(node, _config) do
+    node
   end
 
   def keep_allowed_attrs({tag, attrs, children}, %{"allowed_attributes" => allowed_attributes}) do
@@ -16,9 +20,29 @@ defmodule Semtex.Sanitizer.Passes do
     filtered_attrs =
       attrs
       |> Enum.filter(fn {key, _value} -> MapSet.member?(allowed_attrs_for_tag, key) end)
-      |> Enum.into(%{})
 
-    {:replace, {tag, filtered_attrs, children}}
+    {tag, filtered_attrs, children}
+  end
+
+  def keep_allowed_attrs(node, _config) do
+    node
+  end
+
+  def dedupe_attrs_to_map({tag, attrs, children}, _config) do
+    new_attrs =
+      Enum.reduce(attrs, %{}, fn {key, value}, final_attrs ->
+        if not Map.has_key?(final_attrs, key) do
+          Map.put(final_attrs, key, value)
+        else
+          final_attrs
+        end
+      end)
+
+    {tag, new_attrs, children}
+  end
+
+  def dedupe_attrs_to_map(node, _config) do
+    node
   end
 
   def keep_allowed_url_schemes({tag, attrs, children}, %{"allowed_url_scheme_attributes" => allowed_url_scheme_attributes, "allowed_url_schemes" => allowed_url_schemes}) do
@@ -40,18 +64,18 @@ defmodule Semtex.Sanitizer.Passes do
         end
       end)
 
-    {:replace, {tag, new_attrs, children}}
+    {tag, new_attrs, children}
   end
 
-  def keep_allowed_url_schemes(_node, _config) do
-    {:pass}
+  def keep_allowed_url_schemes(node, _config) do
+    node
   end
 
   def replace_link_rel_values({"a", attrs, children}, %{"link_rel_values" => link_rel_values}) do
-    {:replace, {"a", Map.put(attrs, "rel", Enum.join(link_rel_values, " ")), children}}
+    {"a", Map.put(attrs, "rel", Enum.join(link_rel_values, " ")), children}
   end
 
-  def replace_link_rel_values(_node, _config) do
-    {:pass}
+  def replace_link_rel_values(node, _config) do
+    node
   end
 end

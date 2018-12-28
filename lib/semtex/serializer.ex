@@ -27,31 +27,42 @@ defmodule Semtex.Serializer do
     |> Enum.join("")
   end
 
+  def serialize!({:doctype, "html", "", ""}, _config) do
+    "<!doctype html>"
+  end
+
+  def serialize!({:comment, comment}, _config) do
+    "<!--#{comment}-->"
+  end
+
   def serialize!({tag, attrs, _children}, config) when tag in @self_closing_tags do
-    "<#{tag} #{serialize_attrs!(attrs, config)}/>"
+    "<#{tag}#{serialize_attrs!(attrs, config)}/>"
   end
 
   def serialize!({tag, attrs, children}, config) do
-    "<#{tag} #{serialize_attrs!(attrs, config)}>#{serialize!(children, config)}</#{tag}>"
+    "<#{tag}#{serialize_attrs!(attrs, config)}>#{serialize!(children, config)}</#{tag}>"
   end
 
-  def serialize!(node, _config) when is_binary(node) do
+  def serialize!(node, %{"escape_serialization" => true}) when is_binary(node) do
     Semtex.Escaper.escape_str(node)
   end
 
-  def serialize_attrs!(attrs, _config) when attrs == %{} do
+  def serialize!(node, %{"escape_serialization" => false}) when is_binary(node) do
+    node
+  end
+
+  def serialize_attrs!(attrs, _config) when attrs == [] or attrs == %{} do
     ""
   end
 
   def serialize_attrs!(attrs, config) do
-    attrs
-    |> escape_attrs(config)
-    |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-    |> Enum.join(" ")
-    |> Kernel.<>(" ")
+    " " <> (attrs
+            |> escape_attrs(config)
+            |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
+            |> Enum.join(" "))
   end
 
-  def escape_attrs(attrs, %{"url_encode_attributes" => url_encode_attributes}) do
+  def escape_attrs(attrs, %{"escape_serialization" => true, "url_encode_attributes" => url_encode_attributes}) do
     Enum.map(attrs, fn {attr_key, attr_value} ->
       if Enum.member?(url_encode_attributes, attr_key) do
         case Semtex.Utils.scheme(attr_value) do
@@ -65,5 +76,9 @@ defmodule Semtex.Serializer do
         {attr_key, Semtex.Escaper.escape_str(attr_value)}
       end
     end)
+  end
+
+  def escape_attrs(attrs, %{"escape_serialization" => false}) do
+    attrs
   end
 end
