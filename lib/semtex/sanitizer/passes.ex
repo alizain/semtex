@@ -71,11 +71,11 @@ defmodule Semtex.Sanitizer.Passes do
     node
   end
 
-  def replace_link_rel_values({"a", attrs, children}, %{"link_rel_values" => link_rel_values}) do
-    {"a", Map.put(attrs, "rel", Enum.join(link_rel_values, " ")), children}
+  def replace_anchor_rel_values({"a", attrs, children}, %{"anchor_rel_values" => anchor_rel_values}) do
+    {"a", Map.put(attrs, "rel", Enum.join(anchor_rel_values, " ")), children}
   end
 
-  def replace_link_rel_values(node, _config) do
+  def replace_anchor_rel_values(node, _config) do
     node
   end
 end

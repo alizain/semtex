@@ -36,7 +36,7 @@ defmodule Semtex.Sanitizer do
     |> Passes.keep_allowed_attrs(config)
     |> Passes.dedupe_attrs_to_map(config)
     |> Passes.keep_allowed_url_schemes(config)
-    |> Passes.replace_link_rel_values(config)
+    |> Passes.replace_anchor_rel_values(config)
     |> walk_children(config)
   end
 

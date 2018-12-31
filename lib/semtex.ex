@@ -130,7 +130,7 @@ defmodule Semtex do
       "wtai",
       "xmpp"
     ],
-    "link_rel_values" => ["noopener", "noreferrer", "nofollow"],
+    "anchor_rel_values" => ["noopener", "noreferrer", "nofollow"],
     "strip_comments" => true,
     "escape_serialization" => true
   }
