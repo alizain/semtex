@@ -1,5 +1,4 @@
 defmodule Semtex.Escaper do
-  @escape_regex ~r/["&'<>`\ \!@$%()=+{}\[\]\/*\,\-;^|]/
   @escape_replacements %{
     # From https://github.com/mathiasbynens/he
     "\"" => "&quot;",
@@ -39,14 +38,22 @@ defmodule Semtex.Escaper do
     "|" => "&#x7C;",
   }
 
+  @escape_replacement_codepoints @escape_replacements
+    |> Enum.map(fn {<<codepoint::utf8>>, replacement} ->
+      {codepoint, replacement}
+    end)
+    |> Enum.into(%{})
+
   def escape_str(raw_str) when is_binary(raw_str) do
-    Regex.replace(
-      @escape_regex,
-      raw_str,
-      fn char ->
-        @escape_replacements[char]
-      end,
-      global: true
-    )
+    escape_str(raw_str, "")
+  end
+
+  def escape_str(<<codepoint::utf8, rem_raw_str::binary>>, acc) do
+    char = Map.get(@escape_replacement_codepoints, codepoint, <<codepoint::utf8>>)
+    escape_str(rem_raw_str, acc <> char)
+  end
+
+  def escape_str(<<>>, acc) do
+    acc
   end
 end
