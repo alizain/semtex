@@ -5,9 +5,15 @@ defmodule Semtex.MixProject do
     [
       app: :semtex,
       version: "0.2.0",
+      # Try with Elixir 1.6
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
-      deps: deps()
+      deps: deps(),
+      description: "Sanitize HTML",
+      licenses: "MIT",
+      links: [
+        "https://github.com/alizain/semtex"
+      ]
     ]
   end
 
