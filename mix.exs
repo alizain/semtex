@@ -10,9 +10,11 @@ defmodule Semtex.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       description: "Sanitize HTML",
-      licenses: "MIT",
-      links: [
-        "https://github.com/alizain/semtex"
+      package: [
+        licenses: "MIT",
+        links: [
+          "https://github.com/alizain/semtex"
+        ]
       ]
     ]
   end
@@ -29,7 +31,8 @@ defmodule Semtex.MixProject do
     [
       {:html5ever, "~> 0.7.0", only: [:dev, :test]},
       {:myhtmlex, "~> 0.2.0", only: [:dev, :test]},
-      {:benchee, "~> 0.13", only: [:dev, :test]},
+      {:benchee, "~> 0.13", only: :dev},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 end
