@@ -11,10 +11,10 @@ defmodule Semtex.MixProject do
       deps: deps(),
       description: "Sanitize HTML",
       package: [
-        licenses: "MIT",
-        links: [
-          "https://github.com/alizain/semtex"
-        ]
+        licenses: ["MIT"],
+        links: %{
+          "GitHub" => "https://github.com/alizain/semtex"
+        }
       ]
     ]
   end
