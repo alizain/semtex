@@ -21,8 +21,8 @@ defmodule Semtex.Serializer do
     "wbr"
   ]
 
-  def serialize!(ast, config) when is_list(ast) do
-    ast
+  def serialize!(node, config) when is_list(node) do
+    node
     |> Enum.map(&serialize!(&1, config))
     |> Enum.join("")
   end

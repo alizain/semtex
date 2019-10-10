@@ -1,36 +1,25 @@
 defmodule Semtex.Sanitizer do
   alias Semtex.Sanitizer.Passes
 
-  def sanitize!(raw_html, config) do
-    {:ok, body_nodes} = parse_and_unwrap(raw_html)
-    walk_nodes!(body_nodes, config)
-  end
-
-  defp parse_and_unwrap(raw_html) do
-    with {:ok, parsed_html} <- Semtex.Parser.parse(raw_html) do
-      Semtex.Utils.unwrap_nodes(parsed_html, ["html", "body"])
-    end
-  end
-
-  defp walk_nodes!(nodes, config) when is_list(nodes) do
-    nodes
-    |> Enum.map(&walk_nodes!(&1, config))
+  def sanitize!(node, config) when is_list(node) do
+    node
+    |> Enum.map(&sanitize!(&1, config))
     |> Enum.reject(&is_nil/1)
   end
 
-  defp walk_nodes!(node, _config) when is_binary(node) do
+  def sanitize!(node, _config) when is_binary(node) do
     node
   end
 
-  defp walk_nodes!({:comment, _}, %{"strip_comments" => true}) do
+  def sanitize!({:comment, _}, %{"strip_comments" => true}) do
     nil
   end
 
-  defp walk_nodes!({:comment, _} = comment, %{"strip_comments" => false}) do
+  def sanitize!({:comment, _} = comment, %{"strip_comments" => false}) do
     comment
   end
 
-  defp walk_nodes!(node = {_tag, _attrs, _children}, config) do
+  def sanitize!(node = {_tag, _attrs, _children}, config) do
     node
     |> Passes.keep_allowed_tags(config)
     |> Passes.keep_allowed_attrs(config)
@@ -45,6 +34,6 @@ defmodule Semtex.Sanitizer do
   end
 
   defp walk_children({tag, attrs, children}, config) do
-    {tag, attrs, walk_nodes!(children, config)}
+    {tag, attrs, sanitize!(children, config)}
   end
 end

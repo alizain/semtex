@@ -6,18 +6,16 @@ end
 
 inputs = %{
   "nytimes-article" => load_fixture.("nytimes-article"),
-  # "ots-admin-listing-show" => load_fixture.("ots-admin-listing-show"),
-  # "h5bp" => load_fixture.("h5bp"),
 }
 
 Benchee.run(%{
   "parse" => fn raw_html ->
     raw_html
-    |> Semtex.Parser.parse!()
+    |> Semtex.Parser.parse!(%{parser_module: Html5ever})
   end,
   "parse + minify" => fn raw_html ->
     raw_html
-    |> Semtex.Parser.parse!()
-    |> Semtex.minify!()
+    |> Semtex.Parser.parse!(%{parser_module: Html5ever})
+    |> Semtex.Minifier.minify!()
   end
 }, inputs: inputs, warmup: 5, time: 10)

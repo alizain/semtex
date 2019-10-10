@@ -139,15 +139,11 @@ defmodule Semtex do
     @config
   end
 
-  def sanitize!(raw_html, config \\ @config) do
-    Semtex.Sanitizer.sanitize!(raw_html, config)
-  end
-
-  def serialize!(ast, config \\ @config) do
-    Semtex.Serializer.serialize!(ast, config)
-  end
-
-  def minify!(ast, config \\ @config) do
-    Semtex.Minifier.minify!(ast, config)
+  def sanitize_str_fragment!(raw_html, config \\ @config) when is_binary(raw_html) do
+    raw_html
+    |> String.trim()
+    |> Semtex.Parser.parse_fragment!(config)
+    |> Semtex.Sanitizer.sanitize!(config)
+    |> Semtex.Serializer.serialize!(config)
   end
 end

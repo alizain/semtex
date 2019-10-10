@@ -23,12 +23,12 @@ defmodule Semtex.Minifier do
     "textarea",
   ]
 
-  def minify!(ast, config \\ %{}) when is_list(ast) do
-    minify!(ast, nil, config)
+  def minify!(node, config \\ %{}) when is_list(node) do
+    minify!(node, nil, config)
   end
 
-  def minify!(ast, parent_tag, config) when is_list(ast) do
-    ast
+  def minify!(node, parent_tag, config) when is_list(node) do
+    node
     |> Enum.map(&minify!(&1, parent_tag, config))
     |> remove_leading_and_trailing_whitespace(parent_tag, config)
     |> Enum.reject(fn node -> node == "" end)
@@ -54,17 +54,17 @@ defmodule Semtex.Minifier do
     node
   end
 
-  defp remove_leading_and_trailing_whitespace(ast, parent_tag, config) do
-    ast
+  defp remove_leading_and_trailing_whitespace(node, parent_tag, config) do
+    node
     |> remove_leading_whitespace(parent_tag, config)
     |> Enum.reverse()
     |> remove_leading_whitespace(parent_tag, config)
     |> Enum.reverse()
   end
 
-  defp remove_leading_whitespace(ast, _parent_tag, _config) do
-    {new_ast, _state} =
-      Enum.map_reduce(ast, %{found_content?: false}, fn
+  defp remove_leading_whitespace(node, _parent_tag, _config) do
+    {new_node, _state} =
+      Enum.map_reduce(node, %{found_content?: false}, fn
         node, %{found_content?: false} when is_binary(node) ->
           if trim_whitespace(node) == "" do
             {"", %{found_content?: false}}
@@ -76,7 +76,7 @@ defmodule Semtex.Minifier do
           {node, state}
       end)
 
-    new_ast
+    new_node
   end
 
   defp collapse_whitespace(str) do
