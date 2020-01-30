@@ -3,7 +3,6 @@ defmodule SemtexTest do
   alias SemtexTest.Utils
 
   @parser_modules [
-    # Myhtmlex,
     Html5ever,
   ]
 

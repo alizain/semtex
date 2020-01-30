@@ -50,10 +50,6 @@ defmodule Semtex.Parser do
     do_parse_with(@parser_module, raw_html)
   end
 
-  defp do_parse_with(Myhtmlex, raw_html) do
-    {:ok, [Myhtmlex.decode(raw_html)]}
-  end
-
   defp do_parse_with(Html5ever, raw_html) do
     Html5ever.parse(raw_html)
   end
