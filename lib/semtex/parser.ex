@@ -1,5 +1,5 @@
 defmodule Semtex.Parser do
-  @parser_module Application.get_env(:semtex, :html_parser, nil)
+  @parser_module Application.get_env(:semtex, :html_parser, Html5ever)
 
   def parse(raw_html, opts \\ %{}) do
     case do_parse(raw_html, opts) do
